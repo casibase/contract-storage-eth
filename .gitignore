@@ -16,3 +16,6 @@ states/
 
 # Build outputs
 build/
+
+.idea/
+*.iml
