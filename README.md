@@ -1,105 +1,150 @@
 # contract-storage-eth
-A simple Ethereum smart contract for storing key-value data with event logging.
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Go Version](https://img.shields.io/badge/Go-1.23.0-blue.svg)](https://golang.org)
+[![Solidity](https://img.shields.io/badge/Solidity-^0.8.0-blue.svg)](https://soliditylang.org)
+
+A simple and efficient Ethereum smart contract for storing key-value data with event logging, designed for decentralized data storage applications.
+
+## Table of Contents
+
+- [Contract Overview](#contract-overview)
+- [Prerequisites](#prerequisites)
+- [Deployment](#deployment)
+  - [Prerequisites for Deployment](#prerequisites-for-deployment)
+  - [Method 1: Deploy using Go](#method-1-deploy-using-go)
+  - [Method 2: Deploy using Remix IDE](#method-2-deploy-using-remix-ide)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Contract Overview
 
-The `SaveContract` provides functionality to store structured data (key, field, value) and emit events when data is saved. It supports two methods for saving data:
-- Save using a `DataItem` struct
-- Save using individual string parameters
+The `SaveContract` provides functionality to store structured data in a key-field-value format and emit events when data is saved. It offers two flexible methods for data storage:
+
+- **Struct Method**: Save using a `DataItem` struct for organized data handling
+- **Parameter Method**: Save using individual string parameters for simple operations
+
+### Contract Interface
+
+```solidity
+struct DataItem {
+    string key;
+    string field;
+    string value;
+}
+
+function save(DataItem memory _data) public
+function save(string memory _key, string memory _field, string memory _value) public
+event DataSaved(string key, string field, string value)
+```
 
 ## Prerequisites
 
-- Go 1.23+
-- Local Ethereum development environment (Geth, Ganache, etc.)
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/casibase/contract-storage-eth.git
-cd contract-storage-eth
-```
+- **Go 1.23.0** - [Download and install Go](https://golang.org/dl/)
+- **Solidity Compiler (solc)** - [Installation guide](https://docs.soliditylang.org/en/latest/installing-solidity.html#static-binaries)
+- **Local Ethereum Environment** - Choose one:
+  - [Geth](https://geth.ethereum.org/) (recommended for development)
+  - [Ganache](https://trufflesuite.com/ganache/)
 
 ## Deployment
 
 ### Prerequisites for Deployment
 
 1. Start a local Ethereum node using Geth:
-```bash
-# Start Geth
-geth --dev --http --http.api eth,web3,net --datadir ./data --dev --http.addr 0.0.0.0 --http.corsdomain "*"
-```
 
-Alternatively, you can use other development environments like ganache
+    ```bash
+    # Start Geth
+    geth --dev --http --http.api eth,web3,net --http.corsdomain "https://remix.ethereum.org"
+    ```
+
+    Alternatively, you can use other development environments like ganache.
 
 ### Method 1: Deploy using Go
 
-1. **Compile the contract to get bytecode and ABI**:
-```bash
-solc --bin --abi Storage.sol -o build/
-```
+1. **Clone the repository**:
 
-3. **Run the deployment**:
+    ```bash
+    git clone https://github.com/casibase/contract-storage-eth.git
+    cd contract-storage-eth
+    ```
 
-2. **Edit `config.yaml` to set your JSON-RPC endpoint and private key**:
+2. **Verify Solidity compiler installation**:
 
-```yaml
-# config.yaml
-ethereum:
-  # Ethereum node connection URL
-  rpc_url: "http://127.0.0.1:8545"
-  
-  # Private key (without 0x prefix)
-  # Note: In production, use environment variables or encrypted storage
-  # This is a common test private key, corresponding to address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-  # In Geth development mode, this address usually has test ETH
-  private_key: "YOUR_PRIVATE_KEY_HERE"
-```
+    To compile the contract, use the Solidity compiler (`solc`). Ensure that `solc` is installed on your system. If it is not installed, follow the instructions at [soliditylang.org](https://docs.soliditylang.org/en/latest/installing-solidity.html#static-binaries) to install it.
 
-Replace `"YOUR_PRIVATE_KEY_HERE"` with your Ethereum account's private key.
+    After installation, verify it by running:
 
-Then run the deployment script:
+    ```bash
+    solc --version
+    ```
 
-```bash
-go run deploy.go
-```
+3. **Compile the contract to get bytecode and ABI**:
 
-The Go script will:
-- Connect to your local Ethereum node at `http://127.0.0.1:8545` (Change if needed in `config.yaml`)
-- Deploy the contract
-- Test the contract by calling the `save` function
+    ```bash
+    solc --bin --abi Storage.sol -o build/
+    ```
+
+    This command compiles the `Storage.sol` contract and outputs the bytecode and ABI files into the `build/` directory.
+
+2. **Configure deployment settings**:
+
+    Edit `config.yaml` to set your JSON-RPC endpoint and private key:
+    ```yaml
+    # config.yaml
+    ethereum:
+        # Ethereum node connection URL
+        rpc_url: "http://127.0.0.1:8545"
+        
+        # Private key (without 0x prefix)
+        private_key: "YOUR_PRIVATE_KEY_HERE"
+    ```
+
+    > **Security Note**:
+    Replace `"YOUR_PRIVATE_KEY_HERE"` with your Ethereum account's private key. For development, you can use the default account generated by Geth in dev mode.
+    `b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291`
+
+3. **Run the deployment script**:
+
+   Execute the deployment script:
+
+   ```bash
+   go run deploy.go
+   ```
+
+   The Go script will:
+   - Connect to your local Ethereum node (configured in `config.yaml`)
+   - Deploy the `SaveContract` to the blockchain
+   - Test the contract by calling both `save` functions
+   - Display transaction hashes and contract address
 
 ### Method 2: Deploy using Remix IDE
 
-1. **Start Geth in development mode** (as shown above)
+For users who prefer a web-based approach:
 
-2. **Open Remix IDE** in your browser: https://remix.ethereum.org
+1. **Prepare your environment**:
+   - Start your local Ethereum node (as shown above)
+   - Open [Remix IDE](https://remix.ethereum.org) in your browser
 
-3. **Create new file** in Remix:
-    - Click "Create New File" in the file explorer
-    - Name it `Storage.sol`
-    - Copy and paste the contract code from your local `Storage.sol` file
+2. **Create and compile the contract**:
+   - Upload the `Storage.sol` file to Remix
+   - Go to the "Solidity Compiler" tab
+   - Select compiler version `0.8.0` or higher
+   - Click "Compile Storage.sol"
 
-4. **Compile the contract**:
-    - Go to the "Solidity Compiler" tab
-    - Select compiler version `0.8.0` or higher
-    - Click "Compile Storage.sol"
+3. **Connect to your local node**:
+   - Navigate to the "Deploy & Run Transactions" tab
+   - In "Environment", select "External Http Provider"
+   - Enter your node URL: `http://127.0.0.1:8545`
 
-5. **Connect to local Geth**:
-    - Go to the "Deploy & Run Transactions" tab
-    - In "Environment", select "Injected Provider - MetaMask" or "External Http Provider"
-    - If using External Http Provider, enter: `http://127.0.0.1:8545`
+4. **Deploy and interact**:
+   - Select `SaveContract` in the contract dropdown
+   - Click "Deploy" and confirm the transaction
+   - Use the deployed contract interface to test functions
 
-6. **Deploy the contract**:
-    - Make sure `SaveContract` is selected in the contract dropdown
-    - Click "Deploy"
-    - Confirm the transaction
-    - Get the contract address from the transaction receipt
+## Contributing
 
-7. **Interact with deployed contract**:
-    - The deployed contract will appear in the "Deployed Contracts" section
-    - You can call functions and view transaction results directly in Remix
+We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
