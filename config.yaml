@@ -1,0 +1,23 @@
+ethereum:
+  # Ethereum node connection URL
+  rpc_url: "http://127.0.0.1:8545"
+  
+  # Private key (without 0x prefix)
+  private_key: "your_private_key_here"
+
+build:
+  # Build files directory
+  directory: "./build"
+  
+  # Contract name (without extension)
+  contract_name: "SaveContract"
+
+# Test settings
+test:
+  # Enable post-deployment testing
+  enable: true
+  
+  # Test data
+  test_key: "test_key_123"
+  test_field: "test_field"
+  test_value: "test_value_456"
