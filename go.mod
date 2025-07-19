@@ -1,4 +1,4 @@
-module contract-deploy
+module contract-storage-eth
 
 go 1.23.1
 
